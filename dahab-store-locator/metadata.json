@@ -1,0 +1,7 @@
+{
+  "name": "Dahab Store Locator",
+  "description": "Interactive map to find Dahab stores in Morocco with geolocation and route planning.",
+  "requestFramePermissions": [
+    "geolocation"
+  ]
+}
