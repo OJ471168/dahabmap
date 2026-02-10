@@ -1,0 +1,36 @@
+/* --- COFFEE THEME VARIABLES --- */
+:root {
+    --coffee-gold: #C59D5F;
+    --coffee-dark: #2C241B;
+    --coffee-foam: #F9F5F0;
+    --coffee-text: #4A3B2C;
+}
+
+/* --- LAYOUT STYLES --- */
+body { font-family: 'Inter', sans-serif; margin: 0; padding: 0; width: 100vw; height: 100vh; overflow: hidden; background: var(--coffee-foam); }
+
+#main-content { position: relative; width: 100%; height: 100%; }
+#map { width: 100%; height: 100%; z-index: 1; background: #E5E9EC; }
+
+/* --- CONTROLS --- */
+.floating-controls {
+    position: absolute; top: 20px; left: 60px; z-index: 1000;
+    display: flex; flex-direction: column; gap: 15px; 
+    align-items: flex-start;
+    /* Allow clicks to pass through the wrapper so map is clickable around the button */
+    pointer-events: none; 
+}
+
+.control-capsule {
+    background: rgba(255, 255, 255, 0.98);
+    backdrop-filter: blur(12px);
+    padding: 12px 20px;
+    border-radius: 50px;
+    box-shadow: 0 4px 25px rgba(44, 36, 27, 0.15);
+    display: flex; align-items: center;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    cursor: pointer;
+    border: 1px solid rgba(197, 157, 95, 0.1);
+    pointer-events: auto; /* Re-enable clicks for the button */
+}
+.control-capsule:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(197, 157, 95, 0.

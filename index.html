@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dahab Coffee Locator</title>
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.Default.css" />
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div id="main-content">
+        <div class="floating-controls">
+
+            <div class="control-capsule" id="locator-capsule">
+                <button class="locate-btn" id="locate-btn">
+                    <span class="locate-icon">☕</span> 
+                    <span id="locate-text">Trouver mon café Dahab</span>
+                </button>
+            </div>
+
+            <div id="closest-panel">
+                <div class="drag-handle-bar"></div> 
+                <div class="closest-header">
+                    <span>☕ Proches de vous</span>
+                </div>
+                <div id="closest-list">
+                    </div>
+            </div>
+
+        </div>
+
+        <div id="map"></div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet.markercluster/dist/leaflet.markercluster.js"></script>
+
+    <script src="script.js"></script>
+</body>
+</html>
