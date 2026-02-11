@@ -95,9 +95,19 @@ export default function App() {
         }
         .btn-navigate:hover { background: #2C241B; }
         .btn-navigate svg { width: 16px; height: 16px; fill: white; }
+
+        @media (max-width: 768px) {
+            .leaflet-control-zoom { display: none; }
+        }
       `}</style>
 
-      <div className="absolute top-[20px] left-[60px] max-md:top-auto max-md:bottom-[30px] max-md:left-1/2 max-md:-translate-x-1/2 z-[1000] flex flex-col gap-[15px] items-start max-md:items-center max-md:w-full pointer-events-none">
+      {/* 
+          Updated positioning: 
+          Removed 'max-md:left-1/2 max-md:-translate-x-1/2' because CSS transforms create a new stacking context 
+          that traps fixed-position children (like our bottom sheet) relative to this container instead of the viewport.
+          Replaced with 'max-md:left-0' and relying on 'max-md:items-center' (from flex) for centering the button.
+      */}
+      <div className="absolute top-[20px] left-[60px] max-md:top-auto max-md:bottom-[30px] max-md:left-0 z-[1000] flex flex-col gap-[15px] items-start max-md:items-center max-md:w-full pointer-events-none">
         
         <ControlPanel 
             isLocating={isLocating}
