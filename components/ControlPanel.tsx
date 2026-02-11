@@ -30,7 +30,7 @@ export default function ControlPanel({
       <div 
         onClick={onToggle}
         className={`
-            bg-white/98 backdrop-blur-md px-5 py-3 rounded-full 
+            bg-white backdrop-blur-md px-5 py-3 rounded-full 
             shadow-[0_4px_25px_rgba(44,36,27,0.15)] 
             flex items-center transition-all duration-300 
             border border-[#C59D5F]/10 
