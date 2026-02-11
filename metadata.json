@@ -1,0 +1,7 @@
+{
+  "name": "Dahab Coffee Locator",
+  "description": "Find the closest Dahab Coffee location in Morocco with real-time geolocation.",
+  "requestFramePermissions": [
+    "geolocation"
+  ]
+}
