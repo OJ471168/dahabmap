@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef, useCallback } from 'react';
 import { Store, LatLng } from '../types';
 
 interface ControlPanelProps {
@@ -7,6 +7,8 @@ interface ControlPanelProps {
   onToggle: () => void;
   closestStores: Store[];
   isPanelVisible: boolean;
+  isMobileCollapsed: boolean;
+  onMobileTogglePanel: () => void;
   onStoreClick: (store: Store) => void;
   onResetView: () => void;
   allStores: Store[];
@@ -18,12 +20,17 @@ export default function ControlPanel({
     onToggle,
     closestStores,
     isPanelVisible,
+    isMobileCollapsed,
+    onMobileTogglePanel,
     onStoreClick,
     onResetView,
     allStores,
 }: ControlPanelProps) {
-  const [searchQuery, setSearchQuery] = useState('');
   const [selectedCity, setSelectedCity] = useState('');
+
+  // Touch drag state for mobile swipe-to-dismiss
+  const dragRef = useRef({ startY: 0, currentY: 0, isDragging: false });
+  const panelRef = useRef<HTMLDivElement>(null);
 
   const cities = useMemo(() => {
     const unique = [...new Set(allStores.map(s => s.city))];
@@ -33,38 +40,18 @@ export default function ControlPanel({
 
   const filteredStores = useMemo(() => {
     const source = closestStores.length > 0 ? closestStores : [];
-    if (!searchQuery && !selectedCity) return source;
+    if (!selectedCity) return source;
+    return source.filter(s => s.city === selectedCity);
+  }, [closestStores, selectedCity]);
 
-    let filtered = source;
-    if (selectedCity) {
-      filtered = filtered.filter(s => s.city === selectedCity);
-    }
-    if (searchQuery) {
-      const q = searchQuery.toLowerCase();
-      filtered = filtered.filter(s =>
-        s.title.toLowerCase().includes(q) || s.city.toLowerCase().includes(q)
-      );
-    }
-    return filtered;
-  }, [closestStores, searchQuery, selectedCity]);
-
-  // When no location, allow browsing all stores by search/city
+  // Browse stores by city when no location active
   const browseStores = useMemo(() => {
     if (userLocation || isLocating) return [];
-    if (!searchQuery && !selectedCity) return [];
-
-    let filtered = allStores.map((s, i) => ({ ...s, originalIndex: i }));
-    if (selectedCity) {
-      filtered = filtered.filter(s => s.city === selectedCity);
-    }
-    if (searchQuery) {
-      const q = searchQuery.toLowerCase();
-      filtered = filtered.filter(s =>
-        s.title.toLowerCase().includes(q) || s.city.toLowerCase().includes(q)
-      );
-    }
-    return filtered;
-  }, [allStores, userLocation, isLocating, searchQuery, selectedCity]);
+    if (!selectedCity) return [];
+    return allStores
+      .filter(s => s.city === selectedCity)
+      .map((s, i) => ({ ...s, originalIndex: allStores.indexOf(s) }));
+  }, [allStores, userLocation, isLocating, selectedCity]);
 
   const showBrowsePanel = browseStores.length > 0;
   const displayStores = isPanelVisible ? filteredStores : browseStores;
@@ -80,6 +67,43 @@ export default function ControlPanel({
     if (userLocation) return "Arrêter";
     return "Trouver mon café Dahab";
   };
+
+  // Mobile touch drag handlers
+  const handleTouchStart = useCallback((e: React.TouchEvent) => {
+    dragRef.current.startY = e.touches[0].clientY;
+    dragRef.current.isDragging = true;
+    if (panelRef.current) {
+      panelRef.current.style.transition = 'none';
+    }
+  }, []);
+
+  const handleTouchMove = useCallback((e: React.TouchEvent) => {
+    if (!dragRef.current.isDragging) return;
+    const deltaY = e.touches[0].clientY - dragRef.current.startY;
+    // Only allow dragging down
+    if (deltaY > 0 && panelRef.current) {
+      panelRef.current.style.transform = `translateY(${deltaY}px)`;
+    }
+  }, []);
+
+  const handleTouchEnd = useCallback(() => {
+    if (!dragRef.current.isDragging || !panelRef.current) return;
+    dragRef.current.isDragging = false;
+    panelRef.current.style.transition = '';
+
+    const rect = panelRef.current.getBoundingClientRect();
+    const currentTransform = panelRef.current.style.transform;
+    const match = currentTransform.match(/translateY\((\d+)px\)/);
+    const dragDistance = match ? parseInt(match[1]) : 0;
+
+    // If dragged more than 80px down, collapse
+    if (dragDistance > 80) {
+      panelRef.current.style.transform = '';
+      onMobileTogglePanel();
+    } else {
+      panelRef.current.style.transform = '';
+    }
+  }, [onMobileTogglePanel]);
 
   return (
     <>
@@ -103,22 +127,13 @@ export default function ControlPanel({
         <span>{getButtonLabel()}</span>
       </button>
 
-      {/* Search & Filter Bar */}
-      <div className="flex gap-2 w-[300px] max-md:w-[90vw] pointer-events-auto">
-        <div className="relative flex-1">
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={e => setSearchQuery(e.target.value)}
-            placeholder="Rechercher..."
-            className="w-full bg-white rounded-lg border border-[#eee] px-3 py-2 pl-8 text-[13px] text-coffee-text font-medium placeholder:text-[#bbb] outline-none focus:border-coffee-gold focus:shadow-[0_0_0_2px_rgba(197,157,95,0.15)] transition-all"
-          />
-          <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-[#bbb] text-[13px]">🔍</span>
-        </div>
+      {/* City Filter */}
+      <div className="w-[300px] max-md:w-[90vw] pointer-events-auto">
         <select
           value={selectedCity}
           onChange={e => setSelectedCity(e.target.value)}
-          className="bg-white rounded-lg border border-[#eee] px-2 py-2 text-[12px] text-coffee-text font-medium outline-none focus:border-coffee-gold cursor-pointer max-w-[120px]"
+          className="w-full bg-white rounded-xl border border-[#eee] px-4 py-2.5 text-[13px] text-coffee-text font-semibold outline-none focus:border-coffee-gold focus:shadow-[0_0_0_2px_rgba(197,157,95,0.15)] cursor-pointer shadow-[0_2px_12px_rgba(44,36,27,0.08)] transition-all appearance-none"
+          style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23999' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 12px center' }}
         >
           <option value="">Toutes les villes</option>
           {cities.map(city => (
@@ -128,19 +143,33 @@ export default function ControlPanel({
       </div>
 
       {/* Stores Panel */}
-      <div className={`
-        w-[300px] max-md:w-full bg-white rounded-2xl shadow-[0_10px_40px_rgba(44,36,27,0.15)] overflow-hidden
-        transition-all duration-400 ease-[cubic-bezier(0.2,0.8,0.2,1)]
-        flex flex-col pointer-events-auto
-        max-h-[80vh]
-        opacity-0 -translate-y-[10px] pointer-events-none
+      <div
+        ref={panelRef}
+        className={`
+          w-[300px] max-md:w-full bg-white rounded-2xl shadow-[0_10px_40px_rgba(44,36,27,0.15)] overflow-hidden
+          transition-all duration-400 ease-[cubic-bezier(0.2,0.8,0.2,1)]
+          flex flex-col pointer-events-auto
+          max-h-[80vh]
+          opacity-0 -translate-y-[10px] pointer-events-none
 
-        max-md:fixed max-md:left-0 max-md:bottom-0 max-md:rounded-t-2xl max-md:rounded-b-none max-md:z-[2000] max-md:translate-y-full
+          max-md:fixed max-md:left-0 max-md:bottom-0 max-md:rounded-t-2xl max-md:rounded-b-none max-md:z-[2000]
+          max-md:transition-transform max-md:duration-400 max-md:ease-[cubic-bezier(0.2,0.8,0.2,1)]
 
-        ${panelVisible ? 'opacity-100 translate-y-0 pointer-events-auto max-md:translate-y-0' : ''}
-      `}>
-        {/* Mobile Drag Handle */}
-        <div className="hidden max-md:block w-[40px] h-[4px] bg-[#ddd] rounded-full mx-auto my-[8px]"></div>
+          ${panelVisible && !isMobileCollapsed ? 'opacity-100 translate-y-0 pointer-events-auto max-md:translate-y-0' : ''}
+          ${panelVisible && isMobileCollapsed ? 'opacity-100 translate-y-0 pointer-events-auto max-md:translate-y-[calc(100%-48px)]' : ''}
+          ${!panelVisible ? 'max-md:translate-y-full' : ''}
+        `}
+      >
+        {/* Mobile Drag Handle — tappable to expand/collapse */}
+        <div
+          className="hidden max-md:flex items-center justify-center py-[10px] cursor-pointer shrink-0"
+          onClick={onMobileTogglePanel}
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
+        >
+          <div className="w-[40px] h-[4px] bg-[#ccc] rounded-full"></div>
+        </div>
 
         <div className="
             px-[18px] py-[14px] bg-coffee-dark border-b-[3px] border-coffee-gold
@@ -174,7 +203,6 @@ export default function ControlPanel({
                     </div>
                 ))
             ) : displayStores.length > 0 ? (
-                // STORES LIST
                 displayStores.map((store, i) => (
                     <div
                         key={i}
@@ -201,7 +229,7 @@ export default function ControlPanel({
                 ))
             ) : (panelVisible && closestStores.length > 0) ? (
                 <div className="px-[18px] py-[20px] text-center text-[13px] text-[#aaa] font-medium">
-                    Aucun résultat trouvé
+                    Aucun résultat pour cette ville
                 </div>
             ) : null}
         </div>
