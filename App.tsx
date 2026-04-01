@@ -55,7 +55,6 @@ export default function App() {
   const handleStoreClick = (store: Store) => {
     setFlyToStore(store);
     setTimeout(() => setFlyToStore(null), 100);
-    // Auto-collapse panel on mobile when a store is selected
     setIsMobileCollapsed(true);
   };
 
@@ -86,8 +85,11 @@ export default function App() {
     }
   };
 
+  const storeCount = STORE_DATA.length;
+  const cityCount = new Set(STORE_DATA.map(s => s.city)).size;
+
   return (
-    <div className="relative w-screen h-screen overflow-hidden bg-coffee-foam font-sans">
+    <div className="min-h-screen flex flex-col bg-coffee-foam font-sans">
       <style>{`
         .leaflet-popup-content-wrapper {
             border-radius: 12px; padding: 0; overflow: hidden;
@@ -132,9 +134,27 @@ export default function App() {
         }
       `}</style>
 
-      {/* Error Toast */}
+      {/* ===== HEADER ===== */}
+      <header className="bg-coffee-dark border-b-[3px] border-coffee-gold shrink-0">
+        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <span className="text-2xl">☕</span>
+            <div>
+              <h1 className="text-white font-extrabold text-lg leading-tight">Dahab Coffee</h1>
+              <p className="text-coffee-gold text-[11px] font-semibold uppercase tracking-[1.5px]">Localisateur de cafés</p>
+            </div>
+          </div>
+          <div className="hidden md:flex items-center gap-6 text-[13px] font-semibold text-white/60">
+            <span>{storeCount} cafés</span>
+            <span className="w-[1px] h-4 bg-white/15"></span>
+            <span>{cityCount} villes</span>
+          </div>
+        </div>
+      </header>
+
+      {/* ===== ERROR TOAST ===== */}
       {locationError && (
-        <div className="absolute top-4 left-1/2 -translate-x-1/2 z-[2000] max-w-[90vw] w-[400px] pointer-events-auto">
+        <div className="fixed top-4 left-1/2 -translate-x-1/2 z-[3000] max-w-[90vw] w-[400px] pointer-events-auto">
           <div className="bg-white border border-red-200 rounded-xl shadow-[0_8px_30px_rgba(0,0,0,0.12)] px-4 py-3 flex items-start gap-3">
             <span className="text-red-500 text-lg shrink-0 mt-0.5">⚠</span>
             <p className="text-sm text-coffee-text font-medium leading-snug flex-1">{locationError}</p>
@@ -149,34 +169,49 @@ export default function App() {
         </div>
       )}
 
-      <div className="absolute top-[20px] left-[60px] max-md:top-auto max-md:bottom-[30px] max-md:left-0 z-[1000] flex flex-col gap-[15px] items-start max-md:items-center max-md:w-full pointer-events-none">
+      {/* ===== MAP SECTION ===== */}
+      <main className="flex-1 relative">
+        {/* Map */}
+        <div className="absolute inset-0 bg-[#E5E9EC]">
+          <MapController
+              stores={STORE_DATA}
+              triggerLocate={triggerLocate}
+              resetMap={resetMap}
+              flyToStore={flyToStore}
+              onLocationFound={handleLocationFound}
+              onLocationError={handleLocationError}
+              onSortedStores={handleStoresSorted}
+          />
+        </div>
 
-        <ControlPanel
-            isLocating={isLocating}
-            userLocation={userLocation}
-            onToggle={handleToggleLocation}
-            closestStores={closestStores}
-            isPanelVisible={isPanelVisible}
-            isMobileCollapsed={isMobileCollapsed}
-            onMobileTogglePanel={handleMobileTogglePanel}
-            onStoreClick={handleStoreClick}
-            onResetView={handleResetView}
-            allStores={STORE_DATA}
-        />
+        {/* Overlaid Controls */}
+        <div className="absolute top-[20px] left-[20px] max-md:top-auto max-md:bottom-[30px] max-md:left-0 z-[1000] flex flex-col gap-[15px] items-start max-md:items-center max-md:w-full pointer-events-none">
+          <ControlPanel
+              isLocating={isLocating}
+              userLocation={userLocation}
+              onToggle={handleToggleLocation}
+              closestStores={closestStores}
+              isPanelVisible={isPanelVisible}
+              isMobileCollapsed={isMobileCollapsed}
+              onMobileTogglePanel={handleMobileTogglePanel}
+              onStoreClick={handleStoreClick}
+              onResetView={handleResetView}
+              allStores={STORE_DATA}
+          />
+        </div>
+      </main>
 
-      </div>
-
-      <div className="w-full h-full z-[1] bg-[#E5E9EC]">
-        <MapController
-            stores={STORE_DATA}
-            triggerLocate={triggerLocate}
-            resetMap={resetMap}
-            flyToStore={flyToStore}
-            onLocationFound={handleLocationFound}
-            onLocationError={handleLocationError}
-            onSortedStores={handleStoresSorted}
-        />
-      </div>
+      {/* ===== FOOTER ===== */}
+      <footer className="bg-coffee-dark border-t-[3px] border-coffee-gold shrink-0">
+        <div className="max-w-7xl mx-auto px-6 py-4 flex flex-col md:flex-row items-center justify-between gap-2">
+          <p className="text-white/40 text-[12px] font-medium">
+            © 2025 Dahab Coffee. Tous droits réservés.
+          </p>
+          <div className="flex items-center gap-4 text-[12px] font-medium">
+            <span className="text-white/40">Trouvez votre café le plus proche au Maroc</span>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }
