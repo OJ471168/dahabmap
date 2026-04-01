@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import MapController from './components/MapController';
 import ControlPanel from './components/ControlPanel';
 import { Store, LatLng } from './types';
@@ -9,15 +9,22 @@ export default function App() {
   const [closestStores, setClosestStores] = useState<Store[]>([]);
   const [isLocating, setIsLocating] = useState(false);
   const [isPanelVisible, setIsPanelVisible] = useState(false);
-  
-  // We use this to trigger map actions from outside the map component
+  const [locationError, setLocationError] = useState<string | null>(null);
+
   const [flyToStore, setFlyToStore] = useState<Store | null>(null);
   const [triggerLocate, setTriggerLocate] = useState(false);
   const [resetMap, setResetMap] = useState(false);
 
+  // Auto-dismiss error toast after 5 seconds
+  useEffect(() => {
+    if (locationError) {
+      const timer = setTimeout(() => setLocationError(null), 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [locationError]);
+
   const handleToggleLocation = () => {
     if (userLocation) {
-      // Turn OFF
       setUserLocation(null);
       setIsLocating(false);
       setIsPanelVisible(false);
@@ -25,7 +32,7 @@ export default function App() {
       setResetMap(true);
       setTimeout(() => setResetMap(false), 100);
     } else {
-      // Turn ON
+      setLocationError(null);
       setIsLocating(true);
       setIsPanelVisible(true);
       setTriggerLocate(true);
@@ -36,13 +43,7 @@ export default function App() {
   const handleLocationFound = (latlng: LatLng) => {
     setUserLocation(latlng);
     setIsLocating(false);
-    
-    // Calculate distances
-    // We use a simple distance calc here just for sorting the list logic roughly
-    // The Map component actually handles precise distance if we wanted, 
-    // but here we can just use a Haversine approximation or just let the Map component do the heavy lifting?
-    // The original code calculated distance inside the map event. 
-    // Let's replicate that logic: The MapController will pass back the sorted stores.
+    setLocationError(null);
   };
 
   const handleStoresSorted = (stores: Store[]) => {
@@ -54,9 +55,31 @@ export default function App() {
     setTimeout(() => setFlyToStore(null), 100);
   };
 
+  const handleResetView = () => {
+    setResetMap(true);
+    setTimeout(() => setResetMap(false), 100);
+  };
+
+  const handleLocationError = (code: number) => {
+    setIsLocating(false);
+    setIsPanelVisible(false);
+    switch (code) {
+      case 1:
+        setLocationError("Accès à la localisation refusé. Activez-la dans les paramètres de votre navigateur.");
+        break;
+      case 2:
+        setLocationError("Position indisponible. Vérifiez votre connexion ou vos paramètres GPS.");
+        break;
+      case 3:
+        setLocationError("Délai de localisation dépassé. Réessayez.");
+        break;
+      default:
+        setLocationError("Impossible d'accéder à votre position.");
+    }
+  };
+
   return (
     <div className="relative w-screen h-screen overflow-hidden bg-coffee-foam font-sans">
-      {/* GLOBAL STYLES FOR LEAFLET POPUPS TO MATCH ORIGINAL EXACTLY */}
       <style>{`
         .leaflet-popup-content-wrapper {
             border-radius: 12px; padding: 0; overflow: hidden;
@@ -87,7 +110,7 @@ export default function App() {
 
         .btn-navigate {
             display: flex; align-items: center; justify-content: center; gap: 8px;
-            width: 100%; padding: 12px 0; 
+            width: 100%; padding: 12px 0;
             background: #C59D5F; color: white !important;
             text-decoration: none !important; border-radius: 6px; font-size: 13px; font-weight: 700;
             transition: all 0.2s; box-sizing: border-box;
@@ -101,36 +124,46 @@ export default function App() {
         }
       `}</style>
 
-      {/* 
-          Updated positioning: 
-          Removed 'max-md:left-1/2 max-md:-translate-x-1/2' because CSS transforms create a new stacking context 
-          that traps fixed-position children (like our bottom sheet) relative to this container instead of the viewport.
-          Replaced with 'max-md:left-0' and relying on 'max-md:items-center' (from flex) for centering the button.
-      */}
+      {/* Error Toast */}
+      {locationError && (
+        <div className="absolute top-4 left-1/2 -translate-x-1/2 z-[2000] max-w-[90vw] w-[400px] pointer-events-auto">
+          <div className="bg-white border border-red-200 rounded-xl shadow-[0_8px_30px_rgba(0,0,0,0.12)] px-4 py-3 flex items-start gap-3">
+            <span className="text-red-500 text-lg shrink-0 mt-0.5">⚠</span>
+            <p className="text-sm text-coffee-text font-medium leading-snug flex-1">{locationError}</p>
+            <button
+              onClick={() => setLocationError(null)}
+              className="text-[#ccc] hover:text-coffee-text text-lg leading-none shrink-0 cursor-pointer bg-transparent border-none p-0"
+              aria-label="Fermer"
+            >
+              ×
+            </button>
+          </div>
+        </div>
+      )}
+
       <div className="absolute top-[20px] left-[60px] max-md:top-auto max-md:bottom-[30px] max-md:left-0 z-[1000] flex flex-col gap-[15px] items-start max-md:items-center max-md:w-full pointer-events-none">
-        
-        <ControlPanel 
+
+        <ControlPanel
             isLocating={isLocating}
             userLocation={userLocation}
             onToggle={handleToggleLocation}
             closestStores={closestStores}
             isPanelVisible={isPanelVisible}
             onStoreClick={handleStoreClick}
+            onResetView={handleResetView}
+            allStores={STORE_DATA}
         />
 
       </div>
 
       <div className="w-full h-full z-[1] bg-[#E5E9EC]">
-        <MapController 
+        <MapController
             stores={STORE_DATA}
             triggerLocate={triggerLocate}
             resetMap={resetMap}
             flyToStore={flyToStore}
             onLocationFound={handleLocationFound}
-            onLocationError={() => {
-                alert("Could not access your location.");
-                handleToggleLocation();
-            }}
+            onLocationError={handleLocationError}
             onSortedStores={handleStoresSorted}
         />
       </div>
