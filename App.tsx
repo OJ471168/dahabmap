@@ -9,13 +9,13 @@ export default function App() {
   const [closestStores, setClosestStores] = useState<Store[]>([]);
   const [isLocating, setIsLocating] = useState(false);
   const [isPanelVisible, setIsPanelVisible] = useState(false);
+  const [isMobileCollapsed, setIsMobileCollapsed] = useState(false);
   const [locationError, setLocationError] = useState<string | null>(null);
 
   const [flyToStore, setFlyToStore] = useState<Store | null>(null);
   const [triggerLocate, setTriggerLocate] = useState(false);
   const [resetMap, setResetMap] = useState(false);
 
-  // Auto-dismiss error toast after 5 seconds
   useEffect(() => {
     if (locationError) {
       const timer = setTimeout(() => setLocationError(null), 5000);
@@ -28,6 +28,7 @@ export default function App() {
       setUserLocation(null);
       setIsLocating(false);
       setIsPanelVisible(false);
+      setIsMobileCollapsed(false);
       setClosestStores([]);
       setResetMap(true);
       setTimeout(() => setResetMap(false), 100);
@@ -35,6 +36,7 @@ export default function App() {
       setLocationError(null);
       setIsLocating(true);
       setIsPanelVisible(true);
+      setIsMobileCollapsed(false);
       setTriggerLocate(true);
       setTimeout(() => setTriggerLocate(false), 100);
     }
@@ -53,11 +55,17 @@ export default function App() {
   const handleStoreClick = (store: Store) => {
     setFlyToStore(store);
     setTimeout(() => setFlyToStore(null), 100);
+    // Auto-collapse panel on mobile when a store is selected
+    setIsMobileCollapsed(true);
   };
 
   const handleResetView = () => {
     setResetMap(true);
     setTimeout(() => setResetMap(false), 100);
+  };
+
+  const handleMobileTogglePanel = () => {
+    setIsMobileCollapsed(prev => !prev);
   };
 
   const handleLocationError = (code: number) => {
@@ -149,6 +157,8 @@ export default function App() {
             onToggle={handleToggleLocation}
             closestStores={closestStores}
             isPanelVisible={isPanelVisible}
+            isMobileCollapsed={isMobileCollapsed}
+            onMobileTogglePanel={handleMobileTogglePanel}
             onStoreClick={handleStoreClick}
             onResetView={handleResetView}
             allStores={STORE_DATA}
