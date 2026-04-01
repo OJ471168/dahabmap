@@ -81,8 +81,11 @@ export default function ControlPanel({
     if (!dragRef.current.isDragging) return;
     const deltaY = e.touches[0].clientY - dragRef.current.startY;
     // Only allow dragging down
-    if (deltaY > 0 && panelRef.current) {
-      panelRef.current.style.transform = `translateY(${deltaY}px)`;
+    if (deltaY > 0) {
+      e.preventDefault(); // Prevent pull-to-refresh
+      if (panelRef.current) {
+        panelRef.current.style.transform = `translateY(${deltaY}px)`;
+      }
     }
   }, []);
 
@@ -162,7 +165,7 @@ export default function ControlPanel({
       >
         {/* Mobile Drag Handle — tappable to expand/collapse */}
         <div
-          className="hidden max-md:flex items-center justify-center py-[10px] cursor-pointer shrink-0"
+          className="hidden max-md:flex items-center justify-center py-[10px] cursor-pointer shrink-0 touch-none"
           onClick={onMobileTogglePanel}
           onTouchStart={handleTouchStart}
           onTouchMove={handleTouchMove}
