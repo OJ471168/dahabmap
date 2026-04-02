@@ -40,7 +40,11 @@ export default function MapController({
         zoomAnimation: true,
         fadeAnimation: true,
         markerZoomAnimation: true,
-    }).setView([32.0, -6.5], 6);
+    }).setView([31.5, -7.0], 6);
+
+    // Fit map to show all stores
+    const bounds = L.latLngBounds(stores.map(s => [s.lat, s.lng]));
+    map.fitBounds(bounds, { padding: [30, 30] });
 
     L.control.zoom({ position: 'topright' }).addTo(map);
 
@@ -148,7 +152,8 @@ export default function MapController({
             mapInstanceRef.current.removeLayer(highlightLayerRef.current);
             highlightLayerRef.current = null;
         }
-        mapInstanceRef.current.setView([31.7917, -7.0926], 6);
+        const bounds = L.latLngBounds(stores.map(s => [s.lat, s.lng]));
+        mapInstanceRef.current.fitBounds(bounds, { padding: [30, 30] });
     }
   }, [resetMap]);
 
@@ -190,7 +195,8 @@ export default function MapController({
   const handleResetZoom = () => {
     if (mapInstanceRef.current) {
       mapInstanceRef.current.closePopup();
-      mapInstanceRef.current.setView([32.0, -6.5], 6);
+      const bounds = L.latLngBounds(stores.map(s => [s.lat, s.lng]));
+      mapInstanceRef.current.fitBounds(bounds, { padding: [30, 30] });
     }
   };
 
