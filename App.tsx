@@ -169,7 +169,7 @@ export default function App() {
         <div className="max-w-7xl mx-auto px-6 py-4 md:py-6 flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="shrink-0">
             <img
-              src="https://dahabcoffee.ma/wp-content/uploads/2024/12/LOGO-DAHAB-CAFE.png"
+              src="/logodahab2.png"
               alt="Dahab Coffee"
               className="w-[140px] md:w-[180px] object-contain"
               onError={(e) => {
