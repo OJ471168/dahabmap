@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import MapController from './components/MapController';
 import ControlPanel from './components/ControlPanel';
 import { Store, LatLng } from './types';
@@ -11,6 +11,7 @@ export default function App() {
   const [isPanelVisible, setIsPanelVisible] = useState(false);
   const [isMobileCollapsed, setIsMobileCollapsed] = useState(false);
   const [locationError, setLocationError] = useState<string | null>(null);
+  const [selectedCity, setSelectedCity] = useState('');
 
   const [flyToStore, setFlyToStore] = useState<Store | null>(null);
   const [triggerLocate, setTriggerLocate] = useState(false);
@@ -22,6 +23,20 @@ export default function App() {
       return () => clearTimeout(timer);
     }
   }, [locationError]);
+
+  const cities = useMemo(() => {
+    const cityMap: { [key: string]: number } = {};
+    STORE_DATA.forEach(s => { cityMap[s.city] = (cityMap[s.city] || 0) + 1; });
+    return Object.entries(cityMap).sort((a, b) => a[0].localeCompare(b[0], 'fr'));
+  }, []);
+
+  // Browse stores filtered by city (when no geolocation active)
+  const browseStores = useMemo(() => {
+    if (!selectedCity) return [];
+    return STORE_DATA
+      .filter(s => s.city === selectedCity)
+      .map(s => ({ ...s, originalIndex: STORE_DATA.indexOf(s) }));
+  }, [selectedCity]);
 
   const handleToggleLocation = () => {
     if (userLocation) {
@@ -85,8 +100,20 @@ export default function App() {
     }
   };
 
+  const handleCityClick = (city: string) => {
+    if (selectedCity === city) {
+      setSelectedCity('');
+    } else {
+      setSelectedCity(city);
+    }
+  };
+
   const storeCount = STORE_DATA.length;
   const cityCount = new Set(STORE_DATA.map(s => s.city)).size;
+
+  // Desktop: determine what to show in the sidebar
+  const desktopDisplayStores = isPanelVisible ? closestStores : browseStores;
+  const showDesktopSidebar = isPanelVisible || browseStores.length > 0;
 
   return (
     <div className="min-h-screen flex flex-col bg-coffee-foam font-sans">
@@ -128,6 +155,9 @@ export default function App() {
         }
         .btn-navigate:hover { background: #2C241B; }
         .btn-navigate svg { width: 16px; height: 16px; fill: white; }
+
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
         @media (max-width: 768px) {
             .leaflet-control-zoom { display: none; }
@@ -175,30 +205,125 @@ export default function App() {
         </div>
       )}
 
-      {/* ===== MAIN: Desktop sidebar + map | Mobile fullscreen map with overlay ===== */}
+      {/* ===== TOOLBAR: Find button + City chips (desktop only) ===== */}
+      <div className="hidden md:block bg-white border-b border-[#eee] shrink-0">
+        <div className="max-w-7xl mx-auto px-5 py-3 flex items-center gap-4">
+          {/* Find button */}
+          <button
+            onClick={handleToggleLocation}
+            className={`
+              shrink-0 px-5 py-2.5 rounded-full
+              flex items-center gap-2 transition-all duration-300
+              font-bold text-[13px] cursor-pointer border
+              ${userLocation
+                ? 'bg-coffee-gold text-white border-coffee-gold hover:bg-coffee-dark'
+                : isLocating
+                  ? 'bg-white text-coffee-gold border-coffee-gold animate-pulse-gold'
+                  : 'bg-coffee-dark text-white border-coffee-dark hover:bg-coffee-gold hover:border-coffee-gold'
+              }
+            `}
+          >
+            <span className="text-[16px]">☕</span>
+            <span>
+              {isLocating && !userLocation
+                ? "Recherche..."
+                : userLocation
+                  ? "Arrêter"
+                  : "Trouver mon café"}
+            </span>
+          </button>
+
+          <div className="w-[1px] h-7 bg-[#eee] shrink-0"></div>
+
+          {/* City chips */}
+          <div className="flex-1 overflow-x-auto hide-scrollbar">
+            <div className="flex items-center gap-2">
+              {cities.map(([city, count]) => (
+                <button
+                  key={city}
+                  onClick={() => handleCityClick(city)}
+                  className={`
+                    shrink-0 px-3 py-1.5 rounded-full text-[12px] font-semibold
+                    cursor-pointer transition-all duration-200 border
+                    ${selectedCity === city
+                      ? 'bg-coffee-gold text-white border-coffee-gold'
+                      : 'bg-white text-coffee-text border-[#e0e0e0] hover:border-coffee-gold hover:text-coffee-gold'
+                    }
+                  `}
+                >
+                  {city} <span className={`text-[10px] ${selectedCity === city ? 'text-white/70' : 'text-[#bbb]'}`}>{count}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* ===== MAIN ===== */}
       <main className="flex-1 flex flex-col md:flex-row overflow-hidden md:bg-coffee-foam">
 
-        {/* Desktop Sidebar — hidden on mobile */}
-        <aside className="hidden md:flex flex-col w-[340px] shrink-0 bg-white border-r border-[#eee] overflow-y-auto">
-          <div className="p-5 flex flex-col gap-4">
-            {/* Locate Button */}
-            <ControlPanel
-                isLocating={isLocating}
-                userLocation={userLocation}
-                onToggle={handleToggleLocation}
-                closestStores={closestStores}
-                isPanelVisible={isPanelVisible}
-                isMobileCollapsed={false}
-                onMobileTogglePanel={() => {}}
-                onStoreClick={handleStoreClick}
-                onResetView={handleResetView}
-                allStores={STORE_DATA}
-                isDesktop={true}
-            />
-          </div>
+        {/* Desktop Left Panel — Morocco map image OR results list */}
+        <aside className="hidden md:flex flex-col w-[380px] shrink-0 bg-white border-r border-[#eee]">
+          {showDesktopSidebar ? (
+            <>
+              <div className="px-[18px] py-[12px] bg-coffee-dark border-b-[3px] border-coffee-gold text-[11px] font-bold text-coffee-gold uppercase tracking-[1px] flex items-center justify-between shrink-0">
+                <span className="flex items-center gap-[6px]">
+                  ☕ {isPanelVisible ? 'Proches de vous' : selectedCity}
+                </span>
+                <button
+                  onClick={() => { handleResetView(); setSelectedCity(''); setIsPanelVisible(false); setClosestStores([]); }}
+                  className="text-[10px] text-coffee-gold/70 hover:text-white font-semibold uppercase tracking-[0.5px] cursor-pointer bg-transparent border-none p-0"
+                >
+                  Fermer
+                </button>
+              </div>
+              <div className="overflow-y-auto flex-1">
+                {(isPanelVisible && closestStores.length === 0) ? (
+                  Array(5).fill(0).map((_, i) => (
+                    <div key={i} className="px-[18px] py-[14px] border-b border-[#eee] flex justify-between items-center">
+                      <div className="flex flex-col gap-[6px]">
+                        <div className="w-[140px] h-[16px] rounded bg-gradient-to-r from-[#f0f0f0] via-[#e0e0e0] to-[#f0f0f0] bg-[length:200%_100%] animate-shimmer"></div>
+                        <div className="w-[80px] h-[12px] rounded bg-gradient-to-r from-[#f0f0f0] via-[#e0e0e0] to-[#f0f0f0] bg-[length:200%_100%] animate-shimmer"></div>
+                      </div>
+                      <div className="w-[20px] h-[20px] rounded-full bg-gradient-to-r from-[#f0f0f0] via-[#e0e0e0] to-[#f0f0f0] bg-[length:200%_100%] animate-shimmer"></div>
+                    </div>
+                  ))
+                ) : desktopDisplayStores.length > 0 ? (
+                  desktopDisplayStores.map((store, i) => (
+                    <div
+                      key={i}
+                      onClick={() => handleStoreClick(store)}
+                      className="px-[18px] py-[14px] border-b border-[#eee] cursor-pointer flex items-center justify-between transition-colors duration-200 hover:bg-coffee-foam group last:border-b-0"
+                    >
+                      <div className="flex flex-col">
+                        <div className="text-[15px] font-bold text-coffee-text mb-[2px]">{store.title}</div>
+                        <div className="text-[11px] text-[#aaa] font-semibold uppercase tracking-[0.3px] mb-[2px]">{store.city}</div>
+                        {store.dist !== undefined && (
+                          <div className="text-[12px] text-[#888] font-medium flex items-center gap-[4px]">
+                            <span className="inline-block text-[10px] text-coffee-gold animate-steam">♨</span>
+                            {store.dist >= 1000 ? (store.dist / 1000).toFixed(1) + " km" : Math.round(store.dist) + " m"}
+                          </div>
+                        )}
+                      </div>
+                      <div className="text-[#ddd] text-[20px] transition-transform duration-200 group-hover:text-coffee-gold group-hover:translate-x-[3px]">›</div>
+                    </div>
+                  ))
+                ) : null}
+              </div>
+            </>
+          ) : (
+            /* Morocco map image when no results */
+            <div className="flex-1 flex items-center justify-center p-6 overflow-hidden">
+              <img
+                src="https://dahabcoffee.ma/wp-content/uploads/2025/09/MAP-DAHAB1-1536x1171.jpg"
+                alt="Carte des cafés Dahab au Maroc"
+                className="w-full h-full object-contain"
+              />
+            </div>
+          )}
         </aside>
 
-        {/* Map — boxed on desktop, fullscreen on mobile */}
+        {/* Map */}
         <div className="flex-1 relative md:p-5 max-md:h-full">
           <div className="md:rounded-2xl md:border md:border-[#ddd] md:shadow-[0_4px_20px_rgba(44,36,27,0.1)] overflow-hidden w-full h-full relative bg-[#E5E9EC]">
             <MapController
