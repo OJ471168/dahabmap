@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import L from 'leaflet';
 import { Store, LatLng } from '../types';
 import { defaultIcon } from '../constants';
@@ -27,6 +27,7 @@ export default function MapController({
   const userMarkerRef = useRef<L.CircleMarker | null>(null);
   const markersRef = useRef<{ [key: number]: L.Marker }>({});
   const highlightLayerRef = useRef<L.Layer | null>(null);
+  const [isZoomedIn, setIsZoomedIn] = useState(false);
 
   // Initialize Map
   useEffect(() => {
@@ -47,6 +48,11 @@ export default function MapController({
         attribution: '© CARTO',
         maxZoom: 20
     }).addTo(map);
+
+    // Track zoom level for "full map" button
+    map.on('zoomend', () => {
+        setIsZoomedIn(map.getZoom() > 8);
+    });
 
     // Event Listeners
     map.on('locationfound', (e) => {
@@ -181,5 +187,32 @@ export default function MapController({
     }
   }, [flyToStore]);
 
-  return <div ref={mapContainerRef} className="w-full h-full" />;
+  const handleResetZoom = () => {
+    if (mapInstanceRef.current) {
+      mapInstanceRef.current.closePopup();
+      mapInstanceRef.current.setView([32.0, -6.5], 6);
+    }
+  };
+
+  return (
+    <div className="w-full h-full relative">
+      <div ref={mapContainerRef} className="w-full h-full" />
+      {isZoomedIn && (
+        <button
+          onClick={handleResetZoom}
+          className="absolute top-3 left-1/2 -translate-x-1/2 z-[1000]
+            bg-white px-4 py-2 rounded-full shadow-[0_2px_12px_rgba(44,36,27,0.15)]
+            border border-[#eee] hover:border-coffee-gold
+            text-[13px] font-semibold text-coffee-text
+            cursor-pointer transition-all hover:shadow-[0_4px_20px_rgba(197,157,95,0.2)]
+            flex items-center gap-2"
+        >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/>
+          </svg>
+          Carte complète
+        </button>
+      )}
+    </div>
+  );
 }
