@@ -110,7 +110,8 @@ export default function MapController({
         marker.bindPopup(popupHTML);
 
         marker.on('click', function() {
-            map.flyTo([store.lat, store.lng], 16, { duration: 1.5 });
+            // Offset lat north so pin sits in lower part of view, leaving room for popup above
+            map.flyTo([store.lat + 0.002, store.lng], 16, { duration: 1.5 });
         });
 
         marker.addTo(map);
@@ -167,7 +168,8 @@ export default function MapController({
 
         highlightLayerRef.current = highlightMarker;
 
-        mapInstanceRef.current.flyTo([flyToStore.lat, flyToStore.lng], 16, { duration: 1.5 });
+        // Offset lat north so pin sits in lower part of view, leaving room for popup above
+        mapInstanceRef.current.flyTo([flyToStore.lat + 0.002, flyToStore.lng], 16, { duration: 1.5 });
 
         // Open popup after fly animation completes
         const storeRef = flyToStore;
