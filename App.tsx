@@ -167,18 +167,18 @@ export default function App() {
       {/* ===== HEADER ===== */}
       <header className="bg-white border-b-[3px] border-coffee-gold shrink-0">
         <div className="max-w-7xl mx-auto px-6 py-4 md:py-6 flex flex-col md:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
+          <div className="shrink-0">
             <img
               src="https://i.ibb.co/HM1nRqZ/logo.png"
               alt="Dahab Coffee"
-              className="h-20 md:h-24 w-auto object-contain"
+              className="w-[140px] md:w-[180px] object-contain"
               onError={(e) => {
                 const el = e.target as HTMLImageElement;
                 el.style.display = 'none';
-                el.parentElement!.querySelector('.fallback-logo')?.classList.remove('hidden');
+                el.nextElementSibling?.classList.remove('hidden');
               }}
             />
-            <div className="fallback-logo hidden flex items-center gap-3">
+            <div className="hidden flex items-center gap-3">
               <span className="text-3xl">☕</span>
               <div>
                 <h1 className="text-coffee-dark font-extrabold text-xl md:text-2xl leading-tight">Dahab Coffee</h1>
