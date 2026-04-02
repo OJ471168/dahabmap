@@ -321,11 +321,12 @@ export default function App() {
                 px-5 py-2.5 rounded-full items-center gap-2
                 transition-all duration-300 font-bold text-[13px] cursor-pointer border
                 shadow-[0_4px_20px_rgba(44,36,27,0.15)]
+                backdrop-blur-md
                 ${userLocation
-                  ? 'bg-coffee-gold text-white border-coffee-gold hover:bg-coffee-dark'
+                  ? 'bg-coffee-gold/90 text-white border-white/20 hover:bg-coffee-dark/90'
                   : isLocating
-                    ? 'bg-white text-coffee-gold border-coffee-gold animate-pulse-gold'
-                    : 'bg-coffee-dark text-white border-coffee-dark hover:bg-coffee-gold hover:border-coffee-gold'
+                    ? 'bg-white/80 text-coffee-gold border-coffee-gold animate-pulse-gold'
+                    : 'bg-white/80 text-coffee-dark border-white/30 hover:bg-coffee-gold/90 hover:text-white hover:border-coffee-gold'
                 }
               `}
             >
@@ -335,7 +336,7 @@ export default function App() {
                   ? "Recherche..."
                   : userLocation
                     ? "Arrêter"
-                    : "Trouver mon café"}
+                    : "Trouver mon café Dahab"}
               </span>
             </button>
           </div>
