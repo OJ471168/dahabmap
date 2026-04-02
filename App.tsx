@@ -176,7 +176,7 @@ export default function App() {
       )}
 
       {/* ===== MAIN: Desktop sidebar + map | Mobile fullscreen map with overlay ===== */}
-      <main className="flex-1 flex flex-col md:flex-row overflow-hidden">
+      <main className="flex-1 flex flex-col md:flex-row overflow-hidden md:bg-coffee-foam">
 
         {/* Desktop Sidebar — hidden on mobile */}
         <aside className="hidden md:flex flex-col w-[340px] shrink-0 bg-white border-r border-[#eee] overflow-y-auto">
@@ -198,9 +198,9 @@ export default function App() {
           </div>
         </aside>
 
-        {/* Map */}
-        <div className="flex-1 relative">
-          <div className="absolute inset-0 bg-[#E5E9EC]">
+        {/* Map — boxed on desktop, fullscreen on mobile */}
+        <div className="flex-1 relative md:p-5 max-md:h-full">
+          <div className="md:rounded-2xl md:border md:border-[#ddd] md:shadow-[0_4px_20px_rgba(44,36,27,0.1)] overflow-hidden w-full h-full relative bg-[#E5E9EC]">
             <MapController
                 stores={STORE_DATA}
                 triggerLocate={triggerLocate}
