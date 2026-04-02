@@ -28,7 +28,6 @@ export default function ControlPanel({
 }: ControlPanelProps) {
   const [selectedCity, setSelectedCity] = useState('');
 
-  // Touch drag state for mobile swipe-to-dismiss
   const dragRef = useRef({ startY: 0, currentY: 0, isDragging: false });
   const panelRef = useRef<HTMLDivElement>(null);
 
@@ -44,13 +43,12 @@ export default function ControlPanel({
     return source.filter(s => s.city === selectedCity);
   }, [closestStores, selectedCity]);
 
-  // Browse stores by city when no location active
   const browseStores = useMemo(() => {
     if (userLocation || isLocating) return [];
     if (!selectedCity) return [];
     return allStores
       .filter(s => s.city === selectedCity)
-      .map((s, i) => ({ ...s, originalIndex: allStores.indexOf(s) }));
+      .map((s) => ({ ...s, originalIndex: allStores.indexOf(s) }));
   }, [allStores, userLocation, isLocating, selectedCity]);
 
   const showBrowsePanel = browseStores.length > 0;
@@ -68,7 +66,10 @@ export default function ControlPanel({
     return "Trouver mon café Dahab";
   };
 
-  // Mobile touch drag handlers
+  const handleClearCity = () => {
+    setSelectedCity('');
+  };
+
   const handleTouchStart = useCallback((e: React.TouchEvent) => {
     dragRef.current.startY = e.touches[0].clientY;
     dragRef.current.isDragging = true;
@@ -80,9 +81,8 @@ export default function ControlPanel({
   const handleTouchMove = useCallback((e: React.TouchEvent) => {
     if (!dragRef.current.isDragging) return;
     const deltaY = e.touches[0].clientY - dragRef.current.startY;
-    // Only allow dragging down
     if (deltaY > 0) {
-      e.preventDefault(); // Prevent pull-to-refresh
+      e.preventDefault();
       if (panelRef.current) {
         panelRef.current.style.transform = `translateY(${deltaY}px)`;
       }
@@ -94,12 +94,10 @@ export default function ControlPanel({
     dragRef.current.isDragging = false;
     panelRef.current.style.transition = '';
 
-    const rect = panelRef.current.getBoundingClientRect();
     const currentTransform = panelRef.current.style.transform;
     const match = currentTransform.match(/translateY\((\d+)px\)/);
     const dragDistance = match ? parseInt(match[1]) : 0;
 
-    // If dragged more than 80px down, collapse
     if (dragDistance > 80) {
       panelRef.current.style.transform = '';
       onMobileTogglePanel();
@@ -131,11 +129,11 @@ export default function ControlPanel({
       </button>
 
       {/* City Filter */}
-      <div className="w-[300px] max-md:w-[90vw] pointer-events-auto">
+      <div className="w-[300px] max-md:w-[90vw] pointer-events-auto flex items-center gap-2">
         <select
           value={selectedCity}
           onChange={e => setSelectedCity(e.target.value)}
-          className="w-full bg-white rounded-xl border border-[#eee] px-4 py-2.5 text-[13px] text-coffee-text font-semibold outline-none focus:border-coffee-gold focus:shadow-[0_0_0_2px_rgba(197,157,95,0.15)] cursor-pointer shadow-[0_2px_12px_rgba(44,36,27,0.08)] transition-all appearance-none"
+          className="flex-1 bg-white rounded-xl border border-[#eee] px-4 py-2.5 text-[13px] text-coffee-text font-semibold outline-none focus:border-coffee-gold focus:shadow-[0_0_0_2px_rgba(197,157,95,0.15)] cursor-pointer shadow-[0_2px_12px_rgba(44,36,27,0.08)] transition-all appearance-none"
           style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23999' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 12px center' }}
         >
           <option value="">Toutes les villes</option>
@@ -143,6 +141,15 @@ export default function ControlPanel({
             <option key={city} value={city}>{city}</option>
           ))}
         </select>
+        {selectedCity && (
+          <button
+            onClick={handleClearCity}
+            className="w-9 h-9 rounded-full bg-white border border-[#eee] shadow-[0_2px_12px_rgba(44,36,27,0.08)] flex items-center justify-center text-[#aaa] hover:text-coffee-dark hover:border-coffee-gold cursor-pointer transition-all shrink-0"
+            aria-label="Effacer le filtre"
+          >
+            ×
+          </button>
+        )}
       </div>
 
       {/* Stores Panel */}
@@ -152,7 +159,6 @@ export default function ControlPanel({
           w-[300px] max-md:w-full bg-white rounded-2xl shadow-[0_10px_40px_rgba(44,36,27,0.15)] overflow-hidden
           transition-all duration-400 ease-[cubic-bezier(0.2,0.8,0.2,1)]
           flex flex-col pointer-events-auto
-          max-h-[80vh]
           opacity-0 -translate-y-[10px] pointer-events-none
 
           max-md:fixed max-md:left-0 max-md:bottom-0 max-md:rounded-t-2xl max-md:rounded-b-none max-md:z-[2000]
@@ -163,7 +169,7 @@ export default function ControlPanel({
           ${!panelVisible ? 'max-md:translate-y-full' : ''}
         `}
       >
-        {/* Mobile Drag Handle — tappable to expand/collapse */}
+        {/* Mobile Drag Handle */}
         <div
           className="hidden max-md:flex items-center justify-center py-[10px] cursor-pointer shrink-0 touch-none"
           onClick={onMobileTogglePanel}
@@ -193,9 +199,8 @@ export default function ControlPanel({
             )}
         </div>
 
-        <div className="overflow-y-auto max-h-[50vh]">
+        <div className="overflow-y-auto" style={{ maxHeight: 'min(45vh, 350px)' }}>
             {(isPanelVisible && closestStores.length === 0) ? (
-                // SKELETON LOADER
                 Array(5).fill(0).map((_, i) => (
                     <div key={i} className="px-[18px] py-[14px] border-b border-[#eee] flex justify-between items-center">
                         <div className="flex flex-col gap-[6px]">
