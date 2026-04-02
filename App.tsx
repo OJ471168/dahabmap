@@ -168,10 +168,22 @@ export default function App() {
       <header className="bg-white border-b-[3px] border-coffee-gold shrink-0 overflow-hidden">
         <div className="max-w-7xl mx-auto px-6 py-4 md:py-6 flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <span className="text-3xl">☕</span>
-            <div>
-              <h1 className="text-coffee-dark font-extrabold text-xl md:text-2xl leading-tight">Dahab Coffee</h1>
-              <p className="text-coffee-gold text-[11px] font-semibold uppercase tracking-[1.5px]">Localisateur de cafés</p>
+            <img
+              src="https://i.ibb.co/HM1nRqZ/logo.png"
+              alt="Dahab Coffee"
+              className="h-12 md:h-14 object-contain"
+              onError={(e) => {
+                const el = e.target as HTMLImageElement;
+                el.style.display = 'none';
+                el.parentElement!.querySelector('.fallback-logo')?.classList.remove('hidden');
+              }}
+            />
+            <div className="fallback-logo hidden flex items-center gap-3">
+              <span className="text-3xl">☕</span>
+              <div>
+                <h1 className="text-coffee-dark font-extrabold text-xl md:text-2xl leading-tight">Dahab Coffee</h1>
+                <p className="text-coffee-gold text-[11px] font-semibold uppercase tracking-[1.5px]">Localisateur de cafés</p>
+              </div>
             </div>
           </div>
           <div className="flex items-center gap-6 md:gap-8">
