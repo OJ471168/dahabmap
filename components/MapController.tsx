@@ -41,7 +41,7 @@ export default function MapController({
         markerZoomAnimation: true,
     }).setView([31.7917, -7.0926], 5);
 
-    L.control.zoom({ position: 'topleft' }).addTo(map);
+    L.control.zoom({ position: 'topright' }).addTo(map);
 
     L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
         attribution: '© CARTO',

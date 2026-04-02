@@ -130,8 +130,10 @@ export default function App() {
         .btn-navigate svg { width: 16px; height: 16px; fill: white; }
 
         .leaflet-control-zoom {
-            margin-top: 10px !important;
-            margin-left: 10px !important;
+            position: absolute !important;
+            top: 10px !important;
+            right: 10px !important;
+            left: auto !important;
         }
 
         @media (max-width: 768px) {
@@ -210,7 +212,7 @@ export default function App() {
         </div>
 
         {/* Overlaid Controls */}
-        <div className="absolute top-[10px] left-[60px] max-md:top-auto max-md:bottom-[30px] max-md:left-0 z-[1000] flex flex-col gap-[12px] items-start max-md:items-center max-md:w-full pointer-events-none">
+        <div className="absolute top-[15px] left-[15px] max-md:top-auto max-md:bottom-[30px] max-md:left-0 z-[1000] flex flex-col gap-[12px] items-start max-md:items-center max-md:w-full pointer-events-none">
           <ControlPanel
               isLocating={isLocating}
               userLocation={userLocation}
