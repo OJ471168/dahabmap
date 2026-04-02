@@ -135,19 +135,39 @@ export default function App() {
       `}</style>
 
       {/* ===== HEADER ===== */}
-      <header className="bg-coffee-dark border-b-[3px] border-coffee-gold shrink-0">
-        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <span className="text-2xl">☕</span>
-            <div>
-              <h1 className="text-white font-extrabold text-lg leading-tight">Dahab Coffee</h1>
-              <p className="text-coffee-gold text-[11px] font-semibold uppercase tracking-[1.5px]">Localisateur de cafés</p>
+      <header className="bg-white border-b-[3px] border-coffee-gold shrink-0 overflow-hidden">
+        <div className="max-w-7xl mx-auto px-6 py-6 md:py-8 flex flex-col md:flex-row items-center justify-between gap-6">
+          {/* Left: Brand + Stats */}
+          <div className="flex flex-col items-center md:items-start gap-4">
+            <div className="flex items-center gap-3">
+              <span className="text-3xl">☕</span>
+              <div>
+                <h1 className="text-coffee-dark font-extrabold text-xl md:text-2xl leading-tight">Dahab Coffee</h1>
+                <p className="text-coffee-gold text-[11px] font-semibold uppercase tracking-[1.5px]">Localisateur de cafés</p>
+              </div>
+            </div>
+            {/* Stats row matching brand images */}
+            <div className="flex items-center gap-6 md:gap-8">
+              <div className="flex items-baseline gap-1.5">
+                <span className="text-coffee-gold font-extrabold text-3xl md:text-4xl italic leading-none">+{storeCount}</span>
+                <span className="text-coffee-dark font-extrabold text-[11px] md:text-[13px] uppercase tracking-[1px] leading-tight">Points<br/>de vente</span>
+              </div>
+              <div className="w-[2px] h-10 bg-coffee-gold/20 rounded-full"></div>
+              <div className="flex items-baseline gap-1.5">
+                <span className="text-coffee-gold font-extrabold text-3xl md:text-4xl italic leading-none">+{cityCount}</span>
+                <span className="text-coffee-dark font-extrabold text-[11px] md:text-[13px] uppercase tracking-[1px] leading-tight">Villes<br/>au Maroc</span>
+              </div>
             </div>
           </div>
-          <div className="hidden md:flex items-center gap-6 text-[13px] font-semibold text-white/60">
-            <span>{storeCount} cafés</span>
-            <span className="w-[1px] h-4 bg-white/15"></span>
-            <span>{cityCount} villes</span>
+
+          {/* Right: Morocco map image */}
+          <div className="hidden md:block shrink-0">
+            <img
+              src="https://vlrbeemaxxdqiczdxomd.supabase.co/storage/v1/object/public/events_images/dahab-maroc-map.png"
+              alt="Carte des cafés Dahab au Maroc"
+              className="h-[140px] object-contain opacity-90"
+              onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+            />
           </div>
         </div>
       </header>
