@@ -39,7 +39,7 @@ export default function MapController({
         zoomAnimation: true,
         fadeAnimation: true,
         markerZoomAnimation: true,
-    }).setView([31.7917, -7.0926], 5);
+    }).setView([32.0, -6.5], 6);
 
     L.control.zoom({ position: 'topright' }).addTo(map);
 

@@ -129,13 +129,6 @@ export default function App() {
         .btn-navigate:hover { background: #2C241B; }
         .btn-navigate svg { width: 16px; height: 16px; fill: white; }
 
-        .leaflet-control-zoom {
-            position: absolute !important;
-            top: 10px !important;
-            right: 10px !important;
-            left: auto !important;
-        }
-
         @media (max-width: 768px) {
             .leaflet-control-zoom { display: none; }
         }
@@ -143,38 +136,24 @@ export default function App() {
 
       {/* ===== HEADER ===== */}
       <header className="bg-white border-b-[3px] border-coffee-gold shrink-0 overflow-hidden">
-        <div className="max-w-7xl mx-auto px-6 py-6 md:py-8 flex flex-col md:flex-row items-center justify-between gap-6">
-          {/* Left: Brand + Stats */}
-          <div className="flex flex-col items-center md:items-start gap-4">
-            <div className="flex items-center gap-3">
-              <span className="text-3xl">☕</span>
-              <div>
-                <h1 className="text-coffee-dark font-extrabold text-xl md:text-2xl leading-tight">Dahab Coffee</h1>
-                <p className="text-coffee-gold text-[11px] font-semibold uppercase tracking-[1.5px]">Localisateur de cafés</p>
-              </div>
-            </div>
-            {/* Stats row matching brand images */}
-            <div className="flex items-center gap-6 md:gap-8">
-              <div className="flex items-baseline gap-1.5">
-                <span className="text-coffee-gold font-extrabold text-3xl md:text-4xl italic leading-none">+{storeCount}</span>
-                <span className="text-coffee-dark font-extrabold text-[11px] md:text-[13px] uppercase tracking-[1px] leading-tight">Points<br/>de vente</span>
-              </div>
-              <div className="w-[2px] h-10 bg-coffee-gold/20 rounded-full"></div>
-              <div className="flex items-baseline gap-1.5">
-                <span className="text-coffee-gold font-extrabold text-3xl md:text-4xl italic leading-none">+{cityCount}</span>
-                <span className="text-coffee-dark font-extrabold text-[11px] md:text-[13px] uppercase tracking-[1px] leading-tight">Villes<br/>au Maroc</span>
-              </div>
+        <div className="max-w-7xl mx-auto px-6 py-4 md:py-6 flex flex-col md:flex-row items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <span className="text-3xl">☕</span>
+            <div>
+              <h1 className="text-coffee-dark font-extrabold text-xl md:text-2xl leading-tight">Dahab Coffee</h1>
+              <p className="text-coffee-gold text-[11px] font-semibold uppercase tracking-[1.5px]">Localisateur de cafés</p>
             </div>
           </div>
-
-          {/* Right: Morocco map image */}
-          <div className="hidden md:block shrink-0">
-            <img
-              src="https://vlrbeemaxxdqiczdxomd.supabase.co/storage/v1/object/public/events_images/dahab-maroc-map.png"
-              alt="Carte des cafés Dahab au Maroc"
-              className="h-[140px] object-contain opacity-90"
-              onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
-            />
+          <div className="flex items-center gap-6 md:gap-8">
+            <div className="flex items-baseline gap-1.5">
+              <span className="text-coffee-gold font-extrabold text-2xl md:text-3xl italic leading-none">+{storeCount}</span>
+              <span className="text-coffee-dark font-extrabold text-[10px] md:text-[12px] uppercase tracking-[0.5px] leading-tight">Points<br/>de vente</span>
+            </div>
+            <div className="w-[2px] h-8 bg-coffee-gold/20 rounded-full"></div>
+            <div className="flex items-baseline gap-1.5">
+              <span className="text-coffee-gold font-extrabold text-2xl md:text-3xl italic leading-none">+{cityCount}</span>
+              <span className="text-coffee-dark font-extrabold text-[10px] md:text-[12px] uppercase tracking-[0.5px] leading-tight">Villes<br/>au Maroc</span>
+            </div>
           </div>
         </div>
       </header>
@@ -196,41 +175,65 @@ export default function App() {
         </div>
       )}
 
-      {/* ===== MAP SECTION ===== */}
-      <main className="flex-1 relative">
-        {/* Map */}
-        <div className="absolute inset-0 bg-[#E5E9EC]">
-          <MapController
-              stores={STORE_DATA}
-              triggerLocate={triggerLocate}
-              resetMap={resetMap}
-              flyToStore={flyToStore}
-              onLocationFound={handleLocationFound}
-              onLocationError={handleLocationError}
-              onSortedStores={handleStoresSorted}
-          />
-        </div>
+      {/* ===== MAIN: Desktop sidebar + map | Mobile fullscreen map with overlay ===== */}
+      <main className="flex-1 flex flex-col md:flex-row overflow-hidden">
 
-        {/* Overlaid Controls */}
-        <div className="absolute top-[15px] left-[15px] max-md:top-auto max-md:bottom-[30px] max-md:left-0 z-[1000] flex flex-col gap-[12px] items-start max-md:items-center max-md:w-full pointer-events-none">
-          <ControlPanel
-              isLocating={isLocating}
-              userLocation={userLocation}
-              onToggle={handleToggleLocation}
-              closestStores={closestStores}
-              isPanelVisible={isPanelVisible}
-              isMobileCollapsed={isMobileCollapsed}
-              onMobileTogglePanel={handleMobileTogglePanel}
-              onStoreClick={handleStoreClick}
-              onResetView={handleResetView}
-              allStores={STORE_DATA}
-          />
+        {/* Desktop Sidebar — hidden on mobile */}
+        <aside className="hidden md:flex flex-col w-[340px] shrink-0 bg-white border-r border-[#eee] overflow-y-auto">
+          <div className="p-5 flex flex-col gap-4">
+            {/* Locate Button */}
+            <ControlPanel
+                isLocating={isLocating}
+                userLocation={userLocation}
+                onToggle={handleToggleLocation}
+                closestStores={closestStores}
+                isPanelVisible={isPanelVisible}
+                isMobileCollapsed={false}
+                onMobileTogglePanel={() => {}}
+                onStoreClick={handleStoreClick}
+                onResetView={handleResetView}
+                allStores={STORE_DATA}
+                isDesktop={true}
+            />
+          </div>
+        </aside>
+
+        {/* Map */}
+        <div className="flex-1 relative">
+          <div className="absolute inset-0 bg-[#E5E9EC]">
+            <MapController
+                stores={STORE_DATA}
+                triggerLocate={triggerLocate}
+                resetMap={resetMap}
+                flyToStore={flyToStore}
+                onLocationFound={handleLocationFound}
+                onLocationError={handleLocationError}
+                onSortedStores={handleStoresSorted}
+            />
+          </div>
+
+          {/* Mobile Overlay Controls — hidden on desktop */}
+          <div className="md:hidden absolute bottom-[30px] left-0 z-[1000] flex flex-col gap-[12px] items-center w-full pointer-events-none">
+            <ControlPanel
+                isLocating={isLocating}
+                userLocation={userLocation}
+                onToggle={handleToggleLocation}
+                closestStores={closestStores}
+                isPanelVisible={isPanelVisible}
+                isMobileCollapsed={isMobileCollapsed}
+                onMobileTogglePanel={handleMobileTogglePanel}
+                onStoreClick={handleStoreClick}
+                onResetView={handleResetView}
+                allStores={STORE_DATA}
+                isDesktop={false}
+            />
+          </div>
         </div>
       </main>
 
       {/* ===== FOOTER ===== */}
       <footer className="bg-coffee-dark border-t-[3px] border-coffee-gold shrink-0">
-        <div className="max-w-7xl mx-auto px-6 py-4 flex flex-col md:flex-row items-center justify-between gap-2">
+        <div className="max-w-7xl mx-auto px-6 py-3 flex flex-col md:flex-row items-center justify-between gap-2">
           <p className="text-white/40 text-[12px] font-medium">
             © 2025 Dahab Coffee. Tous droits réservés.
           </p>
