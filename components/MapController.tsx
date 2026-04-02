@@ -214,7 +214,7 @@ const MapController = forwardRef<MapControllerHandle, MapControllerProps>(functi
       {isZoomedIn && (
         <button
           onClick={handleResetZoom}
-          className="absolute bottom-4 max-md:bottom-[100px] left-1/2 -translate-x-1/2 z-[1000]
+          className="absolute bottom-4 max-md:bottom-[140px] left-1/2 -translate-x-1/2 z-[900]
             bg-white/90 backdrop-blur-md px-4 py-2 rounded-full shadow-[0_2px_12px_rgba(44,36,27,0.15)]
             border border-[#eee] hover:border-coffee-gold
             text-[13px] font-semibold text-coffee-text
