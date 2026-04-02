@@ -86,9 +86,15 @@ export default function App() {
     setIsLocating(false);
     setIsPanelVisible(false);
     switch (code) {
-      case 1:
-        setLocationError("Accès à la localisation refusé. Activez-la dans les paramètres de votre navigateur.");
+      case 1: {
+        const isInApp = /FBAN|FBAV|Instagram|WhatsApp|Line|Snapchat/i.test(navigator.userAgent);
+        setLocationError(
+          isInApp
+            ? "La localisation n'est pas disponible dans cette application. Ouvrez dans Safari ou Chrome."
+            : "Accès à la localisation refusé. Activez-la dans les paramètres de votre navigateur."
+        );
         break;
+      }
       case 2:
         setLocationError("Position indisponible. Vérifiez votre connexion ou vos paramètres GPS.");
         break;
