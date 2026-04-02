@@ -123,7 +123,7 @@ export default function ControlPanel({
           }
         `}
       >
-        <span className="text-[16px]">☕</span>
+        <img src="/logodahab2.png" alt="" className="h-5 w-5 object-contain" />
         <span>{getButtonLabel()}</span>
       </button>
 

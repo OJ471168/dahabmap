@@ -330,7 +330,7 @@ export default function App() {
                 }
               `}
             >
-              <span className="text-[16px]">☕</span>
+              <img src="/logodahab2.png" alt="" className="h-5 w-5 object-contain" />
               <span>
                 {isLocating && !userLocation
                   ? "Recherche..."
