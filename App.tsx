@@ -171,7 +171,7 @@ export default function App() {
             <img
               src="https://i.ibb.co/HM1nRqZ/logo.png"
               alt="Dahab Coffee"
-              className="h-16 md:h-20 object-contain"
+              className="h-20 md:h-24 w-auto object-contain"
               onError={(e) => {
                 const el = e.target as HTMLImageElement;
                 el.style.display = 'none';
