@@ -165,13 +165,13 @@ export default function App() {
       `}</style>
 
       {/* ===== HEADER ===== */}
-      <header className="bg-white border-b-[3px] border-coffee-gold shrink-0 overflow-hidden">
+      <header className="bg-white border-b-[3px] border-coffee-gold shrink-0">
         <div className="max-w-7xl mx-auto px-6 py-4 md:py-6 flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <img
               src="https://i.ibb.co/HM1nRqZ/logo.png"
               alt="Dahab Coffee"
-              className="h-12 md:h-14 object-contain"
+              className="h-16 md:h-20 object-contain"
               onError={(e) => {
                 const el = e.target as HTMLImageElement;
                 el.style.display = 'none';
