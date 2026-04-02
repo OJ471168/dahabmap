@@ -124,29 +124,6 @@ export default function ControlPanel({
         <span>{getButtonLabel()}</span>
       </button>
 
-      {/* City Filter */}
-      <div className="w-[90vw] pointer-events-auto flex items-center gap-2">
-        <select
-          value={selectedCity}
-          onChange={e => setSelectedCity(e.target.value)}
-          className="flex-1 bg-white rounded-xl border border-[#eee] px-4 py-2.5 text-[13px] text-coffee-text font-semibold outline-none focus:border-coffee-gold cursor-pointer shadow-[0_2px_12px_rgba(44,36,27,0.08)] transition-all appearance-none"
-          style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23999' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 12px center' }}
-        >
-          <option value="">Toutes les villes</option>
-          {cities.map(city => (
-            <option key={city} value={city}>{city}</option>
-          ))}
-        </select>
-        {selectedCity && (
-          <button
-            onClick={() => setSelectedCity('')}
-            className="w-9 h-9 rounded-full bg-white border border-[#eee] shadow-[0_2px_12px_rgba(44,36,27,0.08)] flex items-center justify-center text-[#aaa] hover:text-coffee-dark hover:border-coffee-gold cursor-pointer transition-all shrink-0"
-            aria-label="Effacer le filtre"
-          >
-            ×
-          </button>
-        )}
-      </div>
 
       {/* Mobile Bottom Sheet */}
       <div

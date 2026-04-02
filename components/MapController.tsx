@@ -207,8 +207,8 @@ export default function MapController({
       {isZoomedIn && (
         <button
           onClick={handleResetZoom}
-          className="absolute bottom-4 left-1/2 -translate-x-1/2 z-[1000]
-            bg-white px-4 py-2 rounded-full shadow-[0_2px_12px_rgba(44,36,27,0.15)]
+          className="absolute bottom-4 max-md:bottom-[100px] left-1/2 -translate-x-1/2 z-[1000]
+            bg-white/90 backdrop-blur-md px-4 py-2 rounded-full shadow-[0_2px_12px_rgba(44,36,27,0.15)]
             border border-[#eee] hover:border-coffee-gold
             text-[13px] font-semibold text-coffee-text
             cursor-pointer transition-all hover:shadow-[0_4px_20px_rgba(197,157,95,0.2)]
