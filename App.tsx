@@ -186,17 +186,11 @@ export default function App() {
               </div>
             </div>
           </div>
-          <div className="flex items-center gap-6 md:gap-8">
-            <div className="flex items-baseline gap-1.5">
-              <span className="text-coffee-gold font-extrabold text-2xl md:text-3xl italic leading-none">+{storeCount}</span>
-              <span className="text-coffee-dark font-extrabold text-[10px] md:text-[12px] uppercase tracking-[0.5px] leading-tight">Points<br/>de vente</span>
-            </div>
-            <div className="w-[2px] h-8 bg-coffee-gold/20 rounded-full"></div>
-            <div className="flex items-baseline gap-1.5">
-              <span className="text-coffee-gold font-extrabold text-2xl md:text-3xl italic leading-none">+{cityCount}</span>
-              <span className="text-coffee-dark font-extrabold text-[10px] md:text-[12px] uppercase tracking-[0.5px] leading-tight">Villes<br/>au Maroc</span>
-            </div>
-          </div>
+          <img
+            src="/MAP-DAHAB-VILLES1.png"
+            alt="Dahab Coffee - Points de vente au Maroc"
+            className="h-12 md:h-16 object-contain"
+          />
         </div>
       </header>
 
