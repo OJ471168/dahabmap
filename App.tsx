@@ -306,7 +306,7 @@ export default function App() {
         </aside>
 
         {/* Map */}
-        <div className="flex-1 relative md:p-5 max-md:h-full">
+        <div className="flex-1 relative md:p-5 min-h-0" style={{ minHeight: '50vh' }}>
           <div className="md:rounded-2xl md:border md:border-[#ddd] md:shadow-[0_4px_20px_rgba(44,36,27,0.1)] overflow-hidden w-full h-full relative bg-[#E5E9EC]">
             <MapController
                 stores={STORE_DATA}
