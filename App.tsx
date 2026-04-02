@@ -205,56 +205,26 @@ export default function App() {
         </div>
       )}
 
-      {/* ===== TOOLBAR: Find button + City chips (desktop only) ===== */}
+      {/* ===== TOOLBAR: City chips in 2 lines (desktop only) ===== */}
       <div className="hidden md:block bg-white border-b border-[#eee] shrink-0">
-        <div className="max-w-7xl mx-auto px-5 py-3 flex items-center gap-4">
-          {/* Find button */}
-          <button
-            onClick={handleToggleLocation}
-            className={`
-              shrink-0 px-5 py-2.5 rounded-full
-              flex items-center gap-2 transition-all duration-300
-              font-bold text-[13px] cursor-pointer border
-              ${userLocation
-                ? 'bg-coffee-gold text-white border-coffee-gold hover:bg-coffee-dark'
-                : isLocating
-                  ? 'bg-white text-coffee-gold border-coffee-gold animate-pulse-gold'
-                  : 'bg-coffee-dark text-white border-coffee-dark hover:bg-coffee-gold hover:border-coffee-gold'
-              }
-            `}
-          >
-            <span className="text-[16px]">☕</span>
-            <span>
-              {isLocating && !userLocation
-                ? "Recherche..."
-                : userLocation
-                  ? "Arrêter"
-                  : "Trouver mon café"}
-            </span>
-          </button>
-
-          <div className="w-[1px] h-7 bg-[#eee] shrink-0"></div>
-
-          {/* City chips */}
-          <div className="flex-1 overflow-x-auto hide-scrollbar">
-            <div className="flex items-center gap-2">
-              {cities.map(([city, count]) => (
-                <button
-                  key={city}
-                  onClick={() => handleCityClick(city)}
-                  className={`
-                    shrink-0 px-3 py-1.5 rounded-full text-[12px] font-semibold
-                    cursor-pointer transition-all duration-200 border
-                    ${selectedCity === city
-                      ? 'bg-coffee-gold text-white border-coffee-gold'
-                      : 'bg-white text-coffee-text border-[#e0e0e0] hover:border-coffee-gold hover:text-coffee-gold'
-                    }
-                  `}
-                >
-                  {city} <span className={`text-[10px] ${selectedCity === city ? 'text-white/70' : 'text-[#bbb]'}`}>{count}</span>
-                </button>
-              ))}
-            </div>
+        <div className="max-w-7xl mx-auto px-5 py-3">
+          <div className="flex flex-wrap items-center gap-2">
+            {cities.map(([city, count]) => (
+              <button
+                key={city}
+                onClick={() => handleCityClick(city)}
+                className={`
+                  px-3 py-1.5 rounded-full text-[12px] font-semibold
+                  cursor-pointer transition-all duration-200 border
+                  ${selectedCity === city
+                    ? 'bg-coffee-gold text-white border-coffee-gold'
+                    : 'bg-white text-coffee-text border-[#e0e0e0] hover:border-coffee-gold hover:text-coffee-gold'
+                  }
+                `}
+              >
+                {city} <span className={`text-[10px] ${selectedCity === city ? 'text-white/70' : 'text-[#bbb]'}`}>{count}</span>
+              </button>
+            ))}
           </div>
         </div>
       </div>
@@ -335,6 +305,32 @@ export default function App() {
                 onLocationError={handleLocationError}
                 onSortedStores={handleStoresSorted}
             />
+
+            {/* Desktop: Find button inside map */}
+            <button
+              onClick={handleToggleLocation}
+              className={`
+                hidden md:flex absolute top-4 left-4 z-[1000]
+                px-5 py-2.5 rounded-full items-center gap-2
+                transition-all duration-300 font-bold text-[13px] cursor-pointer border
+                shadow-[0_4px_20px_rgba(44,36,27,0.15)]
+                ${userLocation
+                  ? 'bg-coffee-gold text-white border-coffee-gold hover:bg-coffee-dark'
+                  : isLocating
+                    ? 'bg-white text-coffee-gold border-coffee-gold animate-pulse-gold'
+                    : 'bg-coffee-dark text-white border-coffee-dark hover:bg-coffee-gold hover:border-coffee-gold'
+                }
+              `}
+            >
+              <span className="text-[16px]">☕</span>
+              <span>
+                {isLocating && !userLocation
+                  ? "Recherche..."
+                  : userLocation
+                    ? "Arrêter"
+                    : "Trouver mon café"}
+              </span>
+            </button>
           </div>
 
           {/* Mobile Overlay Controls — hidden on desktop */}
