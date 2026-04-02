@@ -364,7 +364,7 @@ export default function App() {
       <footer className="bg-coffee-dark border-t-[3px] border-coffee-gold shrink-0">
         <div className="max-w-7xl mx-auto px-6 py-3 flex flex-col md:flex-row items-center justify-between gap-2">
           <p className="text-white/40 text-[12px] font-medium">
-            © 2025 Dahab Coffee. Tous droits réservés.
+            © 2026 Dahab Coffee. Tous droits réservés.
           </p>
           <div className="flex items-center gap-4 text-[12px] font-medium">
             <span className="text-white/40">Trouvez votre café le plus proche au Maroc</span>
