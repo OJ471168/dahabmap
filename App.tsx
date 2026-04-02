@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useMemo } from 'react';
-import MapController from './components/MapController';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
+import MapController, { MapControllerHandle } from './components/MapController';
 import ControlPanel from './components/ControlPanel';
 import { Store, LatLng } from './types';
 import { STORE_DATA } from './constants';
@@ -14,8 +14,8 @@ export default function App() {
   const [selectedCity, setSelectedCity] = useState('');
 
   const [flyToStore, setFlyToStore] = useState<Store | null>(null);
-  const [triggerLocate, setTriggerLocate] = useState(false);
   const [resetMap, setResetMap] = useState(false);
+  const mapRef = useRef<MapControllerHandle>(null);
 
   useEffect(() => {
     if (locationError) {
@@ -52,8 +52,8 @@ export default function App() {
       setIsLocating(true);
       setIsPanelVisible(true);
       setIsMobileCollapsed(false);
-      setTriggerLocate(true);
-      setTimeout(() => setTriggerLocate(false), 100);
+      // Call locate directly (Safari requires user gesture chain)
+      mapRef.current?.locate();
     }
   };
 
@@ -304,8 +304,8 @@ export default function App() {
         <div className="flex-1 relative md:p-5" style={{ minHeight: '75vh' }}>
           <div className="md:rounded-2xl md:border md:border-[#ddd] md:shadow-[0_4px_20px_rgba(44,36,27,0.1)] overflow-hidden absolute inset-0 md:relative md:inset-auto md:w-full md:h-full bg-[#E5E9EC]">
             <MapController
+                ref={mapRef}
                 stores={STORE_DATA}
-                triggerLocate={triggerLocate}
                 resetMap={resetMap}
                 flyToStore={flyToStore}
                 onLocationFound={handleLocationFound}

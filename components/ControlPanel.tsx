@@ -110,17 +110,20 @@ export default function ControlPanel({
         onClick={onToggle}
         aria-label={getButtonLabel()}
         className={`
-          bg-white backdrop-blur-md px-5 py-3 rounded-full
-          shadow-[0_4px_25px_rgba(44,36,27,0.15)]
+          backdrop-blur-md px-5 py-3 rounded-full
+          shadow-[0_4px_20px_rgba(44,36,27,0.15)]
           flex items-center transition-all duration-300
-          border border-[#C59D5F]/10
           cursor-pointer pointer-events-auto
-          font-bold text-[14px] text-coffee-dark gap-[10px]
-          ${isLocating && !userLocation ? 'animate-pulse-gold border-[#C59D5F]' : ''}
-          ${userLocation ? 'text-coffee-gold' : ''}
+          font-bold text-[14px] gap-[10px] border
+          ${userLocation
+            ? 'bg-coffee-gold/90 text-white border-white/20'
+            : isLocating
+              ? 'bg-white/80 text-coffee-gold border-coffee-gold animate-pulse-gold'
+              : 'bg-white/80 text-coffee-dark border-white/30'
+          }
         `}
       >
-        <span className="text-[20px]">☕</span>
+        <span className="text-[16px]">☕</span>
         <span>{getButtonLabel()}</span>
       </button>
 

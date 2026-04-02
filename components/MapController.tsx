@@ -1,11 +1,10 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useImperativeHandle, forwardRef } from 'react';
 import L from 'leaflet';
 import { Store, LatLng } from '../types';
 import { defaultIcon } from '../constants';
 
 interface MapControllerProps {
   stores: Store[];
-  triggerLocate: boolean;
   resetMap: boolean;
   flyToStore: Store | null;
   onLocationFound: (latlng: LatLng) => void;
@@ -13,21 +12,33 @@ interface MapControllerProps {
   onSortedStores: (stores: Store[]) => void;
 }
 
-export default function MapController({
+export interface MapControllerHandle {
+  locate: () => void;
+}
+
+const MapController = forwardRef<MapControllerHandle, MapControllerProps>(function MapController({
     stores,
-    triggerLocate,
     resetMap,
     flyToStore,
     onLocationFound,
     onLocationError,
     onSortedStores
-}: MapControllerProps) {
+}: MapControllerProps, ref) {
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<L.Map | null>(null);
   const userMarkerRef = useRef<L.CircleMarker | null>(null);
   const markersRef = useRef<{ [key: number]: L.Marker }>({});
   const highlightLayerRef = useRef<L.Layer | null>(null);
   const [isZoomedIn, setIsZoomedIn] = useState(false);
+
+  // Expose locate() for direct call from parent (Safari requires user gesture chain)
+  useImperativeHandle(ref, () => ({
+    locate: () => {
+      if (mapInstanceRef.current) {
+        mapInstanceRef.current.locate({ setView: true, maxZoom: 14 });
+      }
+    }
+  }));
 
   // Initialize Map
   useEffect(() => {
@@ -136,13 +147,6 @@ export default function MapController({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Handle Triggers
-  useEffect(() => {
-    if (triggerLocate && mapInstanceRef.current) {
-        mapInstanceRef.current.locate({ setView: true, maxZoom: 14 });
-    }
-  }, [triggerLocate]);
-
   useEffect(() => {
     if (resetMap && mapInstanceRef.current) {
         mapInstanceRef.current.closePopup();
@@ -225,4 +229,6 @@ export default function MapController({
       )}
     </div>
   );
-}
+});
+
+export default MapController;
