@@ -197,8 +197,8 @@ export default function App() {
 
       {/* ===== ERROR TOAST ===== */}
       {locationError && (
-        <div className="fixed top-4 left-1/2 -translate-x-1/2 z-[3000] max-w-[90vw] w-[400px] pointer-events-auto">
-          <div className="bg-white border border-red-200 rounded-xl shadow-[0_8px_30px_rgba(0,0,0,0.12)] px-4 py-3 flex items-start gap-3">
+        <div className="fixed bottom-[120px] max-md:bottom-[130px] left-1/2 -translate-x-1/2 z-[3000] max-w-[90vw] w-[400px] pointer-events-auto">
+          <div className="bg-white/95 backdrop-blur-md border border-red-200 rounded-xl shadow-[0_8px_30px_rgba(0,0,0,0.12)] px-4 py-3 flex items-start gap-3">
             <span className="text-red-500 text-lg shrink-0 mt-0.5">⚠</span>
             <p className="text-sm text-coffee-text font-medium leading-snug flex-1">{locationError}</p>
             <button
