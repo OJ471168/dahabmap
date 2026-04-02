@@ -112,7 +112,10 @@ const MapController = forwardRef<MapControllerHandle, MapControllerProps>(functi
     stores.forEach((store, index) => {
         const marker = L.marker([store.lat, store.lng], { icon: defaultIcon });
 
-        const navLink = `https://www.google.com/maps/dir/?api=1&destination=${store.lat},${store.lng}`;
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+        const navLink = isIOS
+            ? `https://maps.apple.com/?daddr=${store.lat},${store.lng}`
+            : `https://www.google.com/maps/dir/?api=1&destination=${store.lat},${store.lng}`;
 
         const popupHTML = `
             <div class="popup-card">
