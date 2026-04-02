@@ -144,6 +144,7 @@ export default function MapController({
 
   useEffect(() => {
     if (resetMap && mapInstanceRef.current) {
+        mapInstanceRef.current.closePopup();
         if (userMarkerRef.current) {
             mapInstanceRef.current.removeLayer(userMarkerRef.current);
             userMarkerRef.current = null;

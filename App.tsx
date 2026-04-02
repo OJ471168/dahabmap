@@ -103,6 +103,7 @@ export default function App() {
   const handleCityClick = (city: string) => {
     if (selectedCity === city) {
       setSelectedCity('');
+      handleResetView();
     } else {
       setSelectedCity(city);
     }
