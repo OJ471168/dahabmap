@@ -44,7 +44,8 @@ export default function MapController({
 
     // Fit map to show all stores
     const bounds = L.latLngBounds(stores.map(s => [s.lat, s.lng]));
-    map.fitBounds(bounds, { padding: [30, 30] });
+    const isMobile = window.innerWidth < 768;
+    map.fitBounds(bounds, { padding: isMobile ? [20, 10] : [30, 30], maxZoom: isMobile ? 6 : 8 });
 
     L.control.zoom({ position: 'topright' }).addTo(map);
 
@@ -154,7 +155,8 @@ export default function MapController({
             highlightLayerRef.current = null;
         }
         const bounds = L.latLngBounds(stores.map(s => [s.lat, s.lng]));
-        mapInstanceRef.current.fitBounds(bounds, { padding: [30, 30] });
+        const isMobile = window.innerWidth < 768;
+        mapInstanceRef.current.fitBounds(bounds, { padding: isMobile ? [20, 10] : [30, 30], maxZoom: isMobile ? 6 : 8 });
     }
   }, [resetMap]);
 
@@ -197,7 +199,8 @@ export default function MapController({
     if (mapInstanceRef.current) {
       mapInstanceRef.current.closePopup();
       const bounds = L.latLngBounds(stores.map(s => [s.lat, s.lng]));
-      mapInstanceRef.current.fitBounds(bounds, { padding: [30, 30] });
+      const isMobile = window.innerWidth < 768;
+      mapInstanceRef.current.fitBounds(bounds, { padding: isMobile ? [20, 10] : [30, 30], maxZoom: isMobile ? 6 : 8 });
     }
   };
 

@@ -342,7 +342,7 @@ export default function App() {
           </div>
 
           {/* Mobile Overlay Controls — hidden on desktop */}
-          <div className="md:hidden absolute bottom-[30px] left-0 z-[1000] flex flex-col gap-[12px] items-center w-full pointer-events-none">
+          <div className="md:hidden absolute bottom-[60px] left-0 z-[1000] flex flex-col gap-[12px] items-center w-full pointer-events-none">
             <ControlPanel
                 isLocating={isLocating}
                 userLocation={userLocation}
